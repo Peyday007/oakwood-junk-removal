@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Oakwood Junk Removal | Detroit Area Junk Removal & Cleanouts</title>
+  <meta name="description" content="Oakwood Junk Removal provides fast, reliable junk removal in the Detroit area. Furniture, appliances, garage cleanouts, estate cleanouts, yard debris, and more." />
+  <meta name="theme-color" content="#1c4f3d" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --surface: #fff;
+      --surface-alt: #f0ece2;
+      --text: #18201c;
+      --muted: #5f6d66;
+      --line: #d9d4c8;
+      --brand: #1c4f3d;
+      --brand-2: #b68c42;
+      --brand-3: #25463e;
+      --shadow: 0 12px 32px rgba(24, 32, 28, 0.08);
+      --radius: 20px;
+      --radius-sm: 14px;
+      --container: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .container {
+      width: min(var(--container), calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(246, 244, 239, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(28, 79, 61, 0.08);
+    }
+
+    .nav-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      min-height: 76px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 1rem;
+    }
+
+    .brand small {
+      display: block;
+      color: var(--muted);
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      font-weight: 600;
+    }
+
+    .nav a:not(.btn) {
+      color: var(--muted);
+    }
+
+    .nav a:not(.btn):hover {
+      color: var(--brand);
+    }
+
+    .hero {
+      padding: 5rem 0 3.5rem;
+      background:
+        radial-gradient(circle at top right, rgba(182, 140, 66, 0.14), transparent 28%),
+        linear-gradient(180deg, #f8f6f1 0%, #f6f4ef 100%);
+    }
+
+    .hero-grid,
+    .split-grid,
+    .quote-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      margin-bottom: 0.9rem;
+      color: var(--brand);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 0.78rem;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 0.8rem;
+      line-height: 1.1;
+    }
+
+    h1 {
+      font-size: clamp(2.4rem, 5vw, 4.5rem);
+      max-width: 11ch;
+    }
+
+    h2 {
+      font-size: clamp(1.9rem, 3vw, 3rem);
+    }
+
+    h3 {
+      font-size: 1.2rem;
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      color: #33413b;
+      max-width: 62ch;
+    }
+
+    .hero-cta,
+    .cta-band-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      margin: 1.5rem 0;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 1.15rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-sm {
+      min-height: 40px;
+      padding: 0 1rem;
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: white;
+      box-shadow: var(--shadow);
+    }
+
+    .btn-primary:hover {
+      background: #153d2f;
+    }
+
+    .btn-secondary,
+    .btn-outline {
+      background: transparent;
+      color: var(--brand);
+      border-color: rgba(28, 79, 61, 0.2);
+    }
+
+    .btn-secondary:hover,
+    .btn-outline:hover {
+      background: rgba(28, 79, 61, 0.06);
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--brand);
+    }
+
+    .btn-ghost {
+      color: white;
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(24, 32, 28, 0.06);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card .card,
+    .quote-form,
+    .testimonial-panel,
+    .seo-card,
+    .contact-card {
+      padding: 1.5rem;
+    }
+
+    .hero-logo {
+      width: 92px;
+      height: 92px;
+      border-radius: 24px;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 0.8rem;
+      border-radius: 999px;
+      background: rgba(28, 79, 61, 0.08);
+      color: var(--brand);
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .quote-points {
+      display: grid;
+      gap: 1rem;
+      margin-top: 1.25rem;
+    }
+
+    .quote-points div {
+      padding: 0.9rem 1rem;
+      border-radius: var(--radius-sm);
+      background: var(--surface-alt);
+    }
+
+    .quote-points strong {
+      display: block;
+      margin-bottom: 0.2rem;
+    }
+
+    .trust-list,
+    .check-list,
+    .city-list {
+      padding-left: 1.15rem;
+    }
+
+    .proof-bar {
+      padding: 1rem 0;
+      border-top: 1px solid rgba(24, 32, 28, 0.06);
+      border-bottom: 1px solid rgba(24, 32, 28, 0.06);
+      background: #efe9dc;
+    }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      text-align: center;
+      font-weight: 700;
+      color: var(--brand-3);
+    }
+
+    .section {
+      padding: 5rem 0;
+    }
+
+    .section.alt {
+      background: #f0ece3;
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 2rem;
+    }
+
+    .service-grid,
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+
+    .service-card,
+    .step {
+      padding: 1.25rem;
+    }
+
+    .notice {
+      margin-top: 1.25rem;
+      padding: 1rem 1.1rem;
+      border-left: 4px solid var(--brand-2);
+      background: #fbf7ee;
+      border-radius: 12px;
+    }
+
+    .step-num {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(28, 79, 61, 0.1);
+      color: var(--brand);
+      font-weight: 800;
+      margin-bottom: 0.85rem;
+    }
+
+    .testimonial-panel blockquote {
+      margin: 1rem 0 0.6rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .small-note {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+    }
+
+    .tag-list li {
+      padding: 0.65rem 0.85rem;
+      border-radius: 999px;
+      background: var(--surface-alt);
+      font-weight: 600;
+    }
+
+    .quote-form {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .quote-form label {
+      display: grid;
+      gap: 0.45rem;
+      font-weight: 600;
+    }
+
+    .quote-form input,
+    .quote-form textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fcfbf8;
+      padding: 0.9rem 1rem;
+      font: inherit;
+      color: var(--text);
+    }
+
+    .quote-form input:focus,
+    .quote-form textarea:focus {
+      outline: 2px solid rgba(28, 79, 61, 0.18);
+      border-color: rgba(28, 79, 61, 0.28);
+    }
+
+    .faq-list {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .faq-item {
+      padding: 1rem 1.2rem;
+    }
+
+    .faq-item summary {
+      cursor: pointer;
+      font-weight: 700;
+      list-style: none;
+    }
+
+    .faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .faq-item p {
+      margin: 0.75rem 0 0;
+      color: #33413b;
+    }
+
+    .cta-band {
+      padding: 4rem 0;
+      background: linear-gradient(135deg, var(--brand), #14382c);
+      color: white;
+    }
+
+    .cta-band-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .contact-card a {
+      color: var(--brand);
+      font-weight: 700;
+    }
+
+    .thank-you {
+      display: none;
+      padding: 5rem 0;
+      background: #f0ece3;
+    }
+
+    .thank-you:target {
+      display: block;
+    }
+
+    @media (max-width: 980px) {
+      .nav {
+        display: none;
+      }
+
+      .hero-grid,
+      .split-grid,
+      .quote-grid,
+      .cta-band-inner {
+        grid-template-columns: 1fr;
+        display: grid;
+      }
+
+      .service-grid,
+      .steps-grid,
+      .proof-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        padding-top: 3.75rem;
+      }
+
+      .container {
+        width: min(var(--container), calc(100% - 1.2rem));
+      }
+
+      .service-grid,
+      .steps-grid,
+      .proof-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a href="#top" class="brand">
+        <svg class="brand-logo" width="44" height="44" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="320" height="320" rx="64" fill="#1C4F3D"/>
+          <path d="M80 214C80 170.922 114.922 136 158 136H240V164H158C130.386 164 108 186.386 108 214C108 241.614 130.386 264 158 264H240V292H158C114.922 292 80 257.078 80 214Z" fill="#F4E9D3"/>
+          <path d="M164 38L208 108H120L164 38Z" fill="#B68C42"/>
+          <rect x="150" y="92" width="28" height="66" rx="14" fill="#B68C42"/>
+        </svg>
+        <span>
+          <strong>Oakwood Junk Removal</strong>
+          <small>Detroit Area Junk Hauling</small>
+        </span>
+      </a>
+      <nav class="nav">
+        <a href="#services">Services</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#areas">Service Area</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn btn-sm btn-outline" href="mailto:oakwood.opsmi@gmail.com">Email Us</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <div class="eyebrow">Fast local junk removal in Metro Detroit</div>
+          <h1>Detroit-Area Junk Removal Without the Stress</h1>
+          <p class="lead">Oakwood Junk Removal helps homeowners, landlords, property managers, and businesses clear out unwanted junk fast. From old furniture and appliances to garage cleanouts, estate cleanouts, and renovation debris, we lift, load, and haul it away.</p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#quote">Request a Fast Quote</a>
+            <a class="btn btn-secondary" href="mailto:oakwood.opsmi@gmail.com">Email Us</a>
+          </div>
+          <ul class="trust-list">
+            <li>Same-day and next-day availability when open</li>
+            <li>Upfront pricing based on volume, weight, and access</li>
+            <li>We remove items from inside, outside, garage, attic, or curbside</li>
+            <li>Residential and commercial junk removal</li>
+          </ul>
+        </div>
+
+        <div class="hero-card">
+          <div class="card badge-card">
+            <svg class="hero-logo" width="92" height="92" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="320" height="320" rx="64" fill="#1C4F3D"/>
+              <path d="M80 214C80 170.922 114.922 136 158 136H240V164H158C130.386 164 108 186.386 108 214C108 241.614 130.386 264 158 264H240V292H158C114.922 292 80 257.078 80 214Z" fill="#F4E9D3"/>
+              <path d="M164 38L208 108H120L164 38Z" fill="#B68C42"/>
+              <rect x="150" y="92" width="28" height="66" rx="14" fill="#B68C42"/>
+            </svg>
+            <span class="pill">Metro Detroit</span>
+            <h2>Get your space back.</h2>
+            <p>One bulky item or a full cleanout — we make junk removal simple.</p>
+            <div class="quote-points">
+              <div><strong>Furniture</strong><span>Couches, mattresses, dressers, tables</span></div>
+              <div><strong>Appliances</strong><span>Washers, dryers, fridges, stoves</span></div>
+              <div><strong>Cleanouts</strong><span>Garages, estates, rentals, offices</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="proof-bar">
+      <div class="container proof-grid">
+        <div>Fast response</div>
+        <div>Friendly crews</div>
+        <div>Heavy lifting included</div>
+        <div>Detroit area service</div>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">What we remove</span>
+          <h2>Junk Removal Services</h2>
+          <p>We handle most non-hazardous junk removal jobs for homes, rentals, offices, and job sites.</p>
+        </div>
+        <div class="service-grid">
+          <article class="card service-card">
+            <h3>Furniture Removal</h3>
+            <p>Couches, sectionals, recliners, tables, bed frames, mattresses, dressers, desks, and more.</p>
+          </article>
+          <article class="card service-card">
+            <h3>Appliance Removal</h3>
+            <p>Washers, dryers, refrigerators, ovens, dishwashers, and other bulky household appliances.</p>
+          </article>
+          <article class="card service-card">
+            <h3>Garage Cleanouts</h3>
+            <p>Old boxes, broken tools, storage clutter, unwanted equipment, and years of built-up junk.</p>
+          </article>
+          <article class="card service-card">
+            <h3>Estate & Property Cleanouts</h3>
+            <p>Estate cleanouts, eviction cleanouts, foreclosure cleanups, and rental turnover hauling.</p>
+          </article>
+          <article class="card service-card">
+            <h3>Yard Debris Removal</h3>
+            <p>Brush, branches, fencing, bagged yard waste, and outdoor junk removal.</p>
+          </article>
+          <article class="card service-card">
+            <h3>Construction Debris</h3>
+            <p>Drywall, flooring, cabinets, lumber, and renovation debris from home or commercial projects.</p>
+          </article>
+          <article class="card service-card">
+            <h3>Office & Commercial Junk</h3>
+            <p>Office furniture, cubicles, retail fixtures, equipment, and commercial cleanout jobs.</p>
+          </article>
+          <article class="card service-card">
+            <h3>Single-Item Pickup</h3>
+            <p>Need one heavy item gone? We can help with quick pickups when availability allows.</p>
+          </article>
+        </div>
+        <div class="notice">We do <strong>not</strong> automatically accept hazardous materials or certain restricted items. If your job involves paint, chemicals, fuel, asbestos, biohazards, or other special materials, our team will review it first.</div>
+      </div>
+    </section>
+
+    <section class="section alt" id="how-it-works">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">Simple process</span>
+          <h2>How It Works</h2>
+        </div>
+        <div class="steps-grid">
+          <article class="step card">
+            <span class="step-num">1</span>
+            <h3>Tell us what needs to go</h3>
+            <p>Request a quote online. Let us know what items need removal and where they are located.</p>
+          </article>
+          <article class="step card">
+            <span class="step-num">2</span>
+            <h3>Get a quote or appointment</h3>
+            <p>For simple jobs, we can often give you the next available pickup window. For larger jobs, we may request photos or schedule an estimate.</p>
+          </article>
+          <article class="step card">
+            <span class="step-num">3</span>
+            <h3>We lift, load, and haul it away</h3>
+            <p>Our crew does the heavy lifting. You do not have to drag items outside unless you want curbside pickup.</p>
+          </article>
+          <article class="step card">
+            <span class="step-num">4</span>
+            <h3>Enjoy the extra space</h3>
+            <p>Once the junk is gone, your garage, basement, office, or property is usable again.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container split-grid">
+        <div>
+          <span class="eyebrow">Why Oakwood</span>
+          <h2>Why Detroit-Area Customers Choose Oakwood</h2>
+          <ul class="check-list">
+            <li>Fast scheduling when availability allows</li>
+            <li>No heavy lifting for you</li>
+            <li>Clear next steps and straightforward quoting</li>
+            <li>Small pickups to large cleanouts</li>
+            <li>Friendly, professional service</li>
+            <li>Residential, rental, and commercial jobs</li>
+          </ul>
+        </div>
+        <div class="card testimonial-panel">
+          <h3>What people want from a junk crew</h3>
+          <p>They want the job handled fast, the crew to show up, and the junk to be gone without drama. That is the standard Oakwood is built around.</p>
+          <blockquote>“Fast quote, easy scheduling, and they handled all the heavy stuff. Exactly what we needed.”</blockquote>
+          <cite>— Example customer review</cite>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="areas">
+      <div class="container split-grid">
+        <div>
+          <span class="eyebrow">Service area</span>
+          <h2>Serving Detroit and the Surrounding Metro Area</h2>
+          <p>Oakwood Junk Removal serves customers across the Detroit area. Whether you need a couch removed in the city, a garage cleaned out in the suburbs, or a rental property cleared before turnover, we can help.</p>
+          <p>Common service areas may include:</p>
+          <ul class="city-list">
+            <li>Detroit</li>
+            <li>Dearborn</li>
+            <li>Dearborn Heights</li>
+            <li>Livonia</li>
+            <li>Redford</li>
+            <li>Southfield</li>
+            <li>Taylor</li>
+            <li>Allen Park</li>
+            <li>Lincoln Park</li>
+            <li>Westland</li>
+            <li>Garden City</li>
+            <li>Warren</li>
+          </ul>
+          <p class="small-note">If you are nearby but do not see your city listed, contact us to check availability.</p>
+        </div>
+        <div class="card seo-card">
+          <h3>Popular jobs in the Detroit area</h3>
+          <ul class="tag-list">
+            <li>Couch removal</li>
+            <li>Mattress disposal</li>
+            <li>Appliance pickup</li>
+            <li>Garage cleanouts</li>
+            <li>Estate cleanouts</li>
+            <li>Rental turnover cleanouts</li>
+            <li>Office furniture removal</li>
+            <li>Construction debris hauling</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="quote">
+      <div class="container quote-grid">
+        <div>
+          <span class="eyebrow">Get started</span>
+          <h2>Request a Fast Quote</h2>
+          <p>Tell us what needs to be removed, where the job is located, and when you want it done. For larger or more complicated jobs, photos help us estimate faster.</p>
+          <p class="small-note">Leads from this form go through Formspree to Oakwood’s email.</p>
+        </div>
+        <form class="card quote-form" action="https://formspree.io/f/mnjlpybn" method="POST">
+          <input type="hidden" name="_subject" value="New Oakwood Junk Removal quote request" />
+          <input type="hidden" name="_next" value="https://moonlit-babka-3777ca.netlify.app/#thanks" />
+          <input type="hidden" name="source_page" value="single-page" />
+
+          <label>
+            Full Name
+            <input type="text" name="name" placeholder="Your name" required />
+          </label>
+
+          <label>
+            Email Address
+            <input type="email" name="email" placeholder="you@example.com" required />
+          </label>
+
+          <label>
+            Job Address or ZIP Code
+            <input type="text" name="address" placeholder="Detroit, MI or ZIP" required />
+          </label>
+
+          <label>
+            What needs to be removed?
+            <textarea rows="4" name="job" placeholder="Example: couch, mattress, garage clutter, old appliances" required></textarea>
+          </label>
+
+          <label>
+            When do you want it done?
+            <input type="text" name="timing" placeholder="ASAP, this week, next week..." />
+          </label>
+
+          <label>
+            Best phone number (optional)
+            <input type="text" name="phone" placeholder="Optional" />
+          </label>
+
+          <button type="submit" class="btn btn-primary btn-full">Send Quote Request</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="thank-you" id="thanks">
+      <div class="container split-grid">
+        <div>
+          <span class="eyebrow">Request received</span>
+          <h2>Thanks — We Got Your Quote Request</h2>
+          <p class="lead">Oakwood Junk Removal received your message. We’ll review the details and follow up by email as soon as possible.</p>
+        </div>
+        <div class="card contact-card">
+          <h3>Want a faster estimate?</h3>
+          <p>Send photos of the items and access path to:</p>
+          <p><strong><a href="mailto:oakwood.opsmi@gmail.com">oakwood.opsmi@gmail.com</a></strong></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section alt" id="faq">
+      <div class="container">
+        <div class="section-head">
+          <span class="eyebrow">FAQ</span>
+          <h2>Frequently Asked Questions</h2>
+        </div>
+        <div class="faq-list">
+          <details class="card faq-item" open>
+            <summary>How much does junk removal cost?</summary>
+            <p>Pricing depends on volume, weight, item type, and access. For many jobs, we can provide a fast quote after a quick email or photo review.</p>
+          </details>
+          <details class="card faq-item">
+            <summary>Do I need to move everything outside first?</summary>
+            <p>No. We can remove items from inside the property, garage, attic, basement, office, or yard. Curbside pickup is also an option when appropriate.</p>
+          </details>
+          <details class="card faq-item">
+            <summary>Do you offer same-day junk removal?</summary>
+            <p>Yes, when availability allows. Contact us and we will let you know the fastest available appointment window.</p>
+          </details>
+          <details class="card faq-item">
+            <summary>What items can you not take?</summary>
+            <p>We may not accept hazardous or restricted materials such as chemicals, fuel, asbestos, biohazards, and certain specialty waste items. Contact us if you are unsure.</p>
+          </details>
+          <details class="card faq-item">
+            <summary>Can I send photos for a quote?</summary>
+            <p>Yes. Photos help a lot for large cleanouts, bulky-item pickups, and jobs where access or volume is unclear.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="container cta-band-inner">
+        <div>
+          <span class="eyebrow">Ready to clear it out?</span>
+          <h2>Email Oakwood Junk Removal Today</h2>
+          <p>Fast quotes. Straightforward service. Junk gone.</p>
+        </div>
+        <div class="cta-band-actions">
+          <a class="btn btn-light" href="mailto:oakwood.opsmi@gmail.com">oakwood.opsmi@gmail.com</a>
+          <a class="btn btn-ghost" href="#quote">Request a Quote</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
