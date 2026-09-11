@@ -4,6 +4,10 @@
 // into dist/ the same as a top-level file is today. The copy must be
 // byte-identical, since the test suite runs the same contract checks against
 // both the source and the build output.
+//
+// dist/ is what gets deployed, so it holds the site and nothing else: the
+// repository's own manifest and notes are excluded rather than published at
+// a public URL alongside the page.
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, copyFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -16,8 +20,16 @@ const DIST_DIR = join(repoRoot, 'dist');
 
 const EXCLUDED_ENTRIES = new Set(['node_modules', 'test', 'scripts', 'dist', '.git', '.github']);
 
-function isExcluded(name) {
-  return name.startsWith('.') || EXCLUDED_ENTRIES.has(name);
+// Files that exist for the repository rather than for a visitor: the
+// dependency manifest, its lockfile, and the project's own notes. They sit
+// at the repository root only, so they are excluded only there — a file of
+// the same name inside a future asset directory would be site content and is
+// left alone.
+const REPO_ONLY_ROOT_ENTRIES = new Set(['package.json', 'package-lock.json', 'README.md']);
+
+function isExcluded(name, srcDir) {
+  if (name.startsWith('.') || EXCLUDED_ENTRIES.has(name)) return true;
+  return srcDir === repoRoot && REPO_ONLY_ROOT_ENTRIES.has(name);
 }
 
 if (!existsSync(SOURCE_PATH)) {
@@ -33,7 +45,7 @@ mkdirSync(DIST_DIR, { recursive: true });
 // being skipped the way a non-file entry was before.
 function copyDir(srcDir, destDir) {
   for (const name of readdirSync(srcDir)) {
-    if (isExcluded(name)) continue;
+    if (isExcluded(name, srcDir)) continue;
     const srcPath = join(srcDir, name);
     const destPath = join(destDir, name);
     if (statSync(srcPath).isDirectory()) {
@@ -54,7 +66,7 @@ copyDir(repoRoot, DIST_DIR);
 function findMissing(srcDir, destDir) {
   const missing = [];
   for (const name of readdirSync(srcDir)) {
-    if (isExcluded(name)) continue;
+    if (isExcluded(name, srcDir)) continue;
     const srcPath = join(srcDir, name);
     const destPath = join(destDir, name);
     if (statSync(srcPath).isDirectory()) {
