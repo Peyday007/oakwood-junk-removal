@@ -1,10 +1,11 @@
-// Copies the hand-written site into dist/. There is nothing to bundle: one
-// index.html and whatever static files sit beside it at the repository root.
-// The copy must be byte-identical, since the test suite runs the same
-// contract checks against both the source and the build output.
-import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'node:fs';
-import { copyFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+// Copies the hand-written site into dist/. There is nothing to bundle: the
+// index.html and whatever static files and directories sit beside it at the
+// repository root, copied recursively so a future asset directory is carried
+// into dist/ the same as a top-level file is today. The copy must be
+// byte-identical, since the test suite runs the same contract checks against
+// both the source and the build output.
+import { existsSync, mkdirSync, readdirSync, rmSync, statSync, copyFileSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const scriptsDir = dirname(fileURLToPath(import.meta.url));
@@ -27,11 +28,48 @@ if (!existsSync(SOURCE_PATH)) {
 rmSync(DIST_DIR, { recursive: true, force: true });
 mkdirSync(DIST_DIR, { recursive: true });
 
-for (const name of readdirSync(repoRoot)) {
-  if (isExcluded(name)) continue;
-  const entryPath = join(repoRoot, name);
-  if (!statSync(entryPath).isFile()) continue;
-  copyFileSync(entryPath, join(DIST_DIR, name));
+// Recursively copies every non-excluded entry from srcDir into destDir, so a
+// subdirectory added beside index.html later is carried into dist/ instead of
+// being skipped the way a non-file entry was before.
+function copyDir(srcDir, destDir) {
+  for (const name of readdirSync(srcDir)) {
+    if (isExcluded(name)) continue;
+    const srcPath = join(srcDir, name);
+    const destPath = join(destDir, name);
+    if (statSync(srcPath).isDirectory()) {
+      mkdirSync(destPath, { recursive: true });
+      copyDir(srcPath, destPath);
+    } else {
+      copyFileSync(srcPath, destPath);
+    }
+  }
+}
+
+copyDir(repoRoot, DIST_DIR);
+
+// Self-check: walks the same source tree the copy just read and confirms
+// every file it should have produced actually exists in dist/. This is what
+// turns "the copy silently dropped something" into a failed build, since
+// nothing else in the suite asserts dist/ completeness.
+function findMissing(srcDir, destDir) {
+  const missing = [];
+  for (const name of readdirSync(srcDir)) {
+    if (isExcluded(name)) continue;
+    const srcPath = join(srcDir, name);
+    const destPath = join(destDir, name);
+    if (statSync(srcPath).isDirectory()) {
+      missing.push(...findMissing(srcPath, destPath));
+    } else if (!existsSync(destPath)) {
+      missing.push(relative(repoRoot, srcPath));
+    }
+  }
+  return missing;
+}
+
+const missing = findMissing(repoRoot, DIST_DIR);
+if (missing.length > 0) {
+  console.error(`Build failed: dist/ is missing files the copy should have produced: ${missing.join(', ')}`);
+  process.exit(1);
 }
 
 console.log(`Built dist/ from ${SOURCE_PATH}`);
