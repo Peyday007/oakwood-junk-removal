@@ -11,11 +11,38 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      # The version the suite runs on is read out of package.json rather than
+      # written here, so the floor the repository declares and the floor CI
+      # actually exercises cannot drift apart. They did once: engines said
+      # Node 20 while this workflow only ever ran Node 22, and the test script
+      # needed a `node --test` glob that Node 20 does not expand — so the
+      # declared floor had never run the suite and did not work. Raising or
+      # lowering engines.node now moves CI with it. The runner's preinstalled
+      # Node reads the value; setup-node then installs the one we test on.
+      - name: Read the Node floor the repository declares
+        id: node-floor
+        run: |
+          floor="$(node -p "require('./package.json').engines.node.match(/\d+/)[0]")"
+          echo "Declared floor: Node $floor"
+          echo "version=$floor" >> "$GITHUB_OUTPUT"
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ steps.node-floor.outputs.version }}
           cache: npm
+
+      - name: Confirm the running Node is the declared floor
+        run: |
+          echo "Running $(node --version) against declared floor ${{ steps.node-floor.outputs.version }}"
+          node -e '
+            const declared = require("./package.json").engines.node.match(/\d+/)[0];
+            const running = process.versions.node.split(".")[0];
+            if (declared !== running) {
+              console.error(`package.json declares a Node floor of ${declared} but this job is running Node ${running}.`);
+              process.exit(1);
+            }
+          '
 
       - name: Install dependencies
         run: npm ci
