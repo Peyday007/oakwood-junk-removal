@@ -7,7 +7,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "npm run build && node --test test/"
+    "test": "npm run build && node --test 'test/**/*.test.js'"
   },
   "devDependencies": {
     "node-html-parser": "^9.0.4"
