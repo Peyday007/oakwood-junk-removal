@@ -92,4 +92,20 @@ for (const { label, root } of getTargets()) {
       `expected _next ("${nextValue}") to share an origin with the canonical link ("${canonicalHref}")`,
     );
   });
+
+  test(`${label}: _next's fragment, if any, resolves to a real element`, () => {
+    const form = getForm(root);
+    const nextField = form.querySelector('input[name="_next"]');
+    const nextValue = nextField.getAttribute('value');
+    const nextUrl = new URL(nextValue);
+
+    if (!nextUrl.hash) return;
+
+    const fragment = nextUrl.hash.slice(1);
+    const ids = new Set(root.querySelectorAll('[id]').map((el) => el.getAttribute('id')));
+    assert.ok(
+      ids.has(fragment),
+      `_next redirects to fragment "#${fragment}" but no element on the page carries id="${fragment}"`,
+    );
+  });
 }
