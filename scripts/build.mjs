@@ -5,9 +5,14 @@
 // byte-identical, since the test suite runs the same contract checks against
 // both the source and the build output.
 //
-// dist/ is what gets deployed, so it holds the site and nothing else: the
-// repository's own manifest and notes are excluded rather than published at
-// a public URL alongside the page.
+// dist/ is what gets deployed, so it holds the site and nothing else. What
+// makes an entry site content is stated below as a rule rather than as a list
+// of the files that happen to be in the way today: everything at the root is
+// the site, except the machinery the repository runs on itself. A new static
+// file or asset directory dropped beside index.html is therefore published
+// without anyone editing this script — and test/dist-contents.test.js holds
+// the matching statement of what dist/ is expected to contain, so a new file
+// that reaches dist/ fails the suite until someone says it belongs there.
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync, copyFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,18 +23,26 @@ const repoRoot = join(scriptsDir, '..');
 const SOURCE_PATH = join(repoRoot, 'index.html');
 const DIST_DIR = join(repoRoot, 'dist');
 
-const EXCLUDED_ENTRIES = new Set(['node_modules', 'test', 'scripts', 'dist', '.git', '.github']);
+// The repository's own machinery, at any depth: the toolchain it installs,
+// the suite that guards it, the script that builds it, the output of that
+// build, and the version-control and CI directories. None of it is the site.
+const REPOSITORY_DIRECTORIES = new Set(['node_modules', 'test', 'scripts', 'dist', '.git', '.github']);
 
 // Files that exist for the repository rather than for a visitor: the
-// dependency manifest, its lockfile, and the project's own notes. They sit
-// at the repository root only, so they are excluded only there — a file of
-// the same name inside a future asset directory would be site content and is
-// left alone.
-const REPO_ONLY_ROOT_ENTRIES = new Set(['package.json', 'package-lock.json', 'README.md']);
+// dependency manifest, its lockfile, and the project's own notes. They are
+// repository documents at the root specifically — a file of the same name
+// inside an asset directory is part of the site and is published.
+const REPOSITORY_ROOT_FILES = new Set(['package.json', 'package-lock.json', 'README.md']);
 
-function isExcluded(name, srcDir) {
-  if (name.startsWith('.') || EXCLUDED_ENTRIES.has(name)) return true;
-  return srcDir === repoRoot && REPO_ONLY_ROOT_ENTRIES.has(name);
+/**
+ * True when an entry belongs to the site a visitor is served, false when it
+ * belongs to the repository that produces it. Dotted entries — editor state,
+ * .gitignore, CI configuration — are repository machinery wherever they sit.
+ */
+function isSiteEntry(name, srcDir) {
+  if (name.startsWith('.') || REPOSITORY_DIRECTORIES.has(name)) return false;
+  if (srcDir === repoRoot && REPOSITORY_ROOT_FILES.has(name)) return false;
+  return true;
 }
 
 if (!existsSync(SOURCE_PATH)) {
@@ -40,12 +53,12 @@ if (!existsSync(SOURCE_PATH)) {
 rmSync(DIST_DIR, { recursive: true, force: true });
 mkdirSync(DIST_DIR, { recursive: true });
 
-// Recursively copies every non-excluded entry from srcDir into destDir, so a
+// Recursively copies every site entry from srcDir into destDir, so a
 // subdirectory added beside index.html later is carried into dist/ instead of
 // being skipped the way a non-file entry was before.
 function copyDir(srcDir, destDir) {
   for (const name of readdirSync(srcDir)) {
-    if (isExcluded(name, srcDir)) continue;
+    if (!isSiteEntry(name, srcDir)) continue;
     const srcPath = join(srcDir, name);
     const destPath = join(destDir, name);
     if (statSync(srcPath).isDirectory()) {
@@ -66,7 +79,7 @@ copyDir(repoRoot, DIST_DIR);
 function findMissing(srcDir, destDir) {
   const missing = [];
   for (const name of readdirSync(srcDir)) {
-    if (isExcluded(name, srcDir)) continue;
+    if (!isSiteEntry(name, srcDir)) continue;
     const srcPath = join(srcDir, name);
     const destPath = join(destDir, name);
     if (statSync(srcPath).isDirectory()) {
