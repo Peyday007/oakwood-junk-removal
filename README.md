@@ -9,7 +9,8 @@ carries an automated guard against the page silently breaking it.
 
 The suite in `test/` runs the same assertions against both `index.html` and
 the built `dist/index.html`, so a build step can never silently diverge from
-the page a visitor actually sees:
+the page a visitor actually sees, and one further test checks what that build
+publishes at all:
 
 - **`test/form-contract.test.js`** — the quote form's lead-path contract:
   exactly one `<form>` on the page; its `action` is an absolute `https` URL;
@@ -25,6 +26,13 @@ the page a visitor actually sees:
   a non-empty `<title>`, a non-empty meta description, a viewport tag, a
   non-empty `lang` attribute on `<html>`, and an absolute `https` canonical
   link.
+- **`test/dist-contents.test.js`** — what the build publishes, checked
+  against `dist/` alone: the whole directory is listed and compared with the
+  site it is expected to contain, so anything else that reaches `dist/` fails
+  here until a person confirms it is site content rather than repository
+  machinery. `package.json`, `package-lock.json` and this README are named
+  separately, because publishing one of them is the leak the test exists to
+  catch.
 
 None of the tests make a network request. The Formspree endpoint the form
 posts to is live and receives the owner's real leads, so the guard only ever
@@ -40,15 +48,33 @@ npm run build
 
 `npm test` builds `dist/` and then runs the suite against both targets — it
 fails outright if `dist/index.html` is missing, so a build that produced
-nothing cannot pass unnoticed. `npm run build` copies `index.html` (and any
-other static file at the repository root) into `dist/`, byte-identical to the
-source; there is nothing to bundle.
+nothing cannot pass unnoticed. `npm run build` copies the site into `dist/`,
+byte-identical to the source; there is nothing to bundle.
+
+The site is `index.html` and whatever static files and directories sit beside
+it — everything at the repository root except the machinery the repository
+runs on itself. `package.json`, `package-lock.json`, this README, the dotted
+entries, and `node_modules/`, `test/`, `scripts/`, `dist/`, `.git/` and
+`.github/` are withheld, so a deployed visitor cannot fetch the dependency
+list or these notes at a public URL. A new static file or asset directory
+dropped beside `index.html` is published without editing the build script,
+and `test/dist-contents.test.js` fails until someone records that it belongs
+to the site.
 
 `dist/` is **generated, not committed** — it is listed in `.gitignore` and is
 rebuilt by every `npm test` and `npm run build`, including in CI
 (`.github/workflows/ci.yml`, on every push and pull request).
 
 `package-lock.json` is committed, so `npm ci` installs against it directly.
+
+The repository supports **Node 22 and above**, declared in `package.json` as
+`engines.node`. CI reads that floor out of `package.json` instead of pinning a
+version of its own, and fails the job if the Node it is running is not the
+declared one, so the version the suite is actually exercised on and the
+version the repository claims to support cannot drift apart.
+
 The `test` script runs `node --test 'test/**/*.test.js'`: the quoted glob
 matches only the test-bearing files, so it recurses into `test/` without also
-picking up its non-test helper modules as pseudo tests.
+picking up its non-test helper modules as pseudo tests. Expanding that glob is
+also why the floor is 22 — `node --test` does not expand it on Node 20, which
+the repository used to declare while never running the suite there.
