@@ -68,10 +68,13 @@ rebuilt by every `npm test` and `npm run build`, including in CI
 `package-lock.json` is committed, so `npm ci` installs against it directly.
 
 The repository supports **Node 22 and above**, declared in `package.json` as
-`engines.node`. CI reads that floor out of `package.json` instead of pinning a
-version of its own, and fails the job if the Node it is running is not the
-declared one, so the version the suite is actually exercised on and the
-version the repository claims to support cannot drift apart.
+`engines.node`. CI derives the versions it runs from that range rather than
+pinning versions of its own, and runs both of its ends: one job on the floor
+exactly, one on the latest release, because `>=22` promises a visitor on a
+newer Node just as much as one on 22. A final job reads back which Node each
+of those jobs actually ran and fails if either end went unexercised, so the
+range the repository declares and the versions the suite is genuinely run on
+cannot drift apart — in either direction.
 
 The `test` script runs `node --test 'test/**/*.test.js'`: the quoted glob
 matches only the test-bearing files, so it recurses into `test/` without also
