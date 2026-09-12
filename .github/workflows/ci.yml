@@ -1,0 +1,165 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  # `engines.node` is a range, not a single version, so the versions the suite
+  # runs on are derived from it here instead of being written into the matrix
+  # by hand. Two things have gone wrong in this repository already and both are
+  # closed by deriving them: engines once said Node 20 while the workflow only
+  # ever ran Node 22, so the declared floor had never run the suite and in fact
+  # could not (the test script needs a `node --test` glob that Node 20 does not
+  # expand); and the fix for that pinned CI to the floor alone, so `>=22` was
+  # promising every later Node without a single job running one. The matrix is
+  # therefore both ends of the range — the floor exactly, and `latest` for the
+  # open end `>=` leaves. Raising or lowering engines.node moves CI with it.
+  node-versions:
+    name: Derive the Node versions from the declared range
+    runs-on: ubuntu-latest
+    outputs:
+      floor: ${{ steps.derive.outputs.floor }}
+      versions: ${{ steps.derive.outputs.versions }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # The runner's preinstalled Node reads the value; setup-node then
+      # installs the ones we test on.
+      - name: Derive the versions
+        id: derive
+        run: |
+          floor="$(node -p "require('./package.json').engines.node.match(/\d+/)[0]")"
+          echo "Declared floor: Node $floor. Running: $floor (the floor) and latest (the open end)."
+          {
+            echo "floor=$floor"
+            echo "versions=[\"$floor\",\"latest\"]"
+          } >> "$GITHUB_OUTPUT"
+
+  verify:
+    name: Verify on Node ${{ matrix.node }}
+    needs: node-versions
+    runs-on: ubuntu-latest
+    strategy:
+      # Both ends are reported: a failure on latest must not hide whether the
+      # floor still passes, and the other way round.
+      fail-fast: false
+      matrix:
+        node: ${{ fromJSON(needs.node-versions.outputs.versions) }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Confirm this job runs the Node it was asked to
+        env:
+          REQUESTED: ${{ matrix.node }}
+          MATRIX_FLOOR: ${{ needs.node-versions.outputs.floor }}
+        run: |
+          echo "Running $(node --version) for matrix entry '$REQUESTED' (declared floor: $MATRIX_FLOOR)"
+          node -e '
+            const declared = require("./package.json").engines.node;
+            const floor = Number(declared.match(/\d+/)[0]);
+            const running = Number(process.versions.node.split(".")[0]);
+            const requested = process.env.REQUESTED;
+            if (Number(process.env.MATRIX_FLOOR) !== floor) {
+              console.error(`This matrix was built from a floor of ${process.env.MATRIX_FLOOR}, but package.json declares ${floor}.`);
+              process.exit(1);
+            }
+            if (running < floor) {
+              console.error(`package.json declares Node ${declared} but this job is running Node ${running}.`);
+              process.exit(1);
+            }
+            if (requested === String(floor) && running !== floor) {
+              console.error(`This job exists to exercise the declared floor, Node ${floor}, but it is running Node ${running}.`);
+              process.exit(1);
+            }
+          '
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # What this job asked for and what it actually ran, written outside the
+      # working tree so the repository stays clean (a stray file at the root
+      # would be published by the build and fail the dist guard). The job below
+      # reads these instead of trusting the matrix to have held what it claims.
+      - name: Record the Node this job exercised
+        env:
+          REQUESTED: ${{ matrix.node }}
+        run: |
+          node -e '
+            const { writeFileSync } = require("node:fs");
+            const { join } = require("node:path");
+            writeFileSync(
+              join(process.env.RUNNER_TEMP, "node-run.json"),
+              JSON.stringify({ requested: process.env.REQUESTED, major: Number(process.versions.node.split(".")[0]) }),
+            );
+          '
+
+      - name: Upload what this job exercised
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-run-${{ matrix.node }}
+          path: ${{ runner.temp }}/node-run.json
+          if-no-files-found: error
+
+  # The assertion that keeps `>=22` from quietly meaning "22 and nothing else":
+  # it reads what the verify jobs actually ran and fails if either end of the
+  # declared range went unexercised. Pinning the matrix back to one version, or
+  # dropping the floor entry, fails here rather than shrinking coverage in
+  # silence. It asserts the open end by the entry that was requested, not by a
+  # version number, so it stays correct in the year the floor and the newest
+  # release are the same major.
+  declared-range-exercised:
+    name: The run exercised the declared range
+    needs: [node-versions, verify]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download what each verify job exercised
+        uses: actions/download-artifact@v4
+        with:
+          pattern: node-run-*
+          path: exercised
+
+      - name: Confirm both ends of the range were run
+        env:
+          FLOOR: ${{ needs.node-versions.outputs.floor }}
+        run: |
+          node -e '
+            const { readdirSync, readFileSync } = require("node:fs");
+            const { join } = require("node:path");
+            const root = "exercised";
+            const runs = readdirSync(root).map((dir) =>
+              JSON.parse(readFileSync(join(root, dir, "node-run.json"), "utf8")),
+            );
+            const floor = Number(process.env.FLOOR);
+            console.log(`Exercised: ${runs.map((r) => `${r.requested} -> Node ${r.major}`).join(", ")} (declared floor: ${floor})`);
+
+            const atFloor = runs.find((r) => r.requested === String(floor));
+            if (!atFloor || atFloor.major !== floor) {
+              console.error(`package.json declares a floor of Node ${floor}, but no job in this run exercised it. The declared floor must be a version the suite is actually run on.`);
+              process.exit(1);
+            }
+
+            const openEnd = runs.find((r) => r.requested === "latest");
+            if (!openEnd) {
+              console.error(`package.json declares Node >=${floor}, which promises every later version too, but no job in this run exercised the latest release. Restore the "latest" entry in the matrix.`);
+              process.exit(1);
+            }
+            if (openEnd.major < floor) {
+              console.error(`The latest release resolved to Node ${openEnd.major}, below the declared floor of ${floor}.`);
+              process.exit(1);
+            }
+          '
